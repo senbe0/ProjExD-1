@@ -1,7 +1,6 @@
 import random
 import time
 
-#グローバル変数定義
 num_of_alphabet = 26 #全アルファベット数
 num_of_all_chars = 10 #対象文字数
 num_of_abs_chars = 2 #欠損文字数
@@ -54,7 +53,7 @@ if __name__ == "__main__":
     st = time.time()
     alphabet = [chr(i + 65) for i in range(num_of_alphabet)]
     print(alphabet)
-    for _ in range(num_of_trials):
+    for i in range(num_of_trials):
         abs_chars = shutudai(alphabet)
         ret = kaitou(abs_chars)
         if ret:
