@@ -16,8 +16,8 @@ def button_click(event):
 def add_click(event):
     btn = event.widget
     func = btn["text"]
+    values = entry.get()
     if func == "De":
-        values = entry.get()
         values = values[:-1]
         entry.delete(0,tk.END)
         entry.insert(0,values)
@@ -53,8 +53,8 @@ for ope in operators:
         c = 0
 
 
-operators = [ "C", "De"]
-for ope in operators:
+clear_op = [ "C", "De"]
+for ope in clear_op:
     button = tk.Button(root, text=f"{ope}", width=4, height=1, font=("", 30))
     button.grid(row=r, column=c)
     button.bind("<1>", add_click)
@@ -62,6 +62,5 @@ for ope in operators:
     if c%3 == 0:
         r += 1
         c = 0
-
 
 root.mainloop()
