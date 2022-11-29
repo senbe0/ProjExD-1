@@ -52,7 +52,6 @@ for ope in operators:
         r += 1
         c = 0
 
-
 clear_op = [ "C", "De"]
 for ope in clear_op:
     button = tk.Button(root, text=f"{ope}", width=4, height=1, font=("", 30))
