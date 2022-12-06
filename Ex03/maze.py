@@ -3,16 +3,19 @@ import maze_maker as mm
 
 def key_down(event):
     global key
+    
     key = event.keysym
 
 
 def key_up(event):
     global key
+
     key = ""
 
 
 def main_proc():
     global cx, cy, mx, my, tori
+
     if key == "Up": 
         my -= 1
         tori = tk.PhotoImage(file=gazou[1])#移動時の画像の指定
