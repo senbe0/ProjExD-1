@@ -3,7 +3,6 @@ import random
 import sys
 import time
 
-
 def check_bound(obj_rct, scr_rct):
     # 第1引数：こうかとんrectまたは爆弾rect
     # 第2引数：スクリーンrect
@@ -96,7 +95,6 @@ def main():
 
         pg.display.update()
         clock.tick(1000)
-
 
 if __name__ == "__main__":
     pg.init()
