@@ -16,7 +16,6 @@ def check_bound(obj_rct, scr_rct):
 
 def main():
     clock =pg.time.Clock()
-    times = pg.time.get_ticks()
     pg.display.set_caption("逃げろ！こうかとん")
     scrn_sfc = pg.display.set_mode((1600, 900))
     scrn_rct = scrn_sfc.get_rect()
