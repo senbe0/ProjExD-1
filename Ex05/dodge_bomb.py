@@ -17,6 +17,7 @@ class Screen:
     def blit(self):
         self.sfc.blit(self.bgi_sfc, self.bgi_rct) 
 
+
 class Bird:
     key_delta = {
         pg.K_UP:    [0, -1],
@@ -44,6 +45,7 @@ class Bird:
                 self.rct.centerx -= delta[0]
                 self.rct.centery -= delta[1]
         self.blit(scr)                
+
 
 class Bomb:
     def __init__(self, color, rad, vxy, scr:Screen):
@@ -80,7 +82,6 @@ class timer:
         return self.boms
 
 
-
 def check_bound(obj_rct, scr_rct):
     """
     第1引数：こうかとんrectまたは爆弾rect
@@ -93,7 +94,6 @@ def check_bound(obj_rct, scr_rct):
     if obj_rct.top < scr_rct.top or scr_rct.bottom < obj_rct.bottom:
         tate = -1
     return yoko, tate
-
 
 def main():
     clock =pg.time.Clock()
@@ -117,9 +117,6 @@ def main():
 
     #時間で爆弾を追加するクラスの呼び出し
     boms = timer()
-    
-
-
 
     # 練習２
     while True:        
@@ -142,7 +139,6 @@ def main():
 
         pg.display.update()
         clock.tick(1000)
-
 
 if __name__ == "__main__":
     pg.init()
