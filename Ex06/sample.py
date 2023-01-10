@@ -68,6 +68,24 @@ class Bomb:
         self.vx *= yoko
         self.vy *= tate
         self.blit(scr)
+#キノコを生成する関数 長濱
+class BigMushroom:
+    def __init__(self, img_path, vxy, xy, ratio):
+        self.sfc = pg.image.load(img_path)
+        self.sfc = pg.transform.rotozoom(self.sfc, 0, ratio)
+        self.rct = self.sfc.get_rect()
+        self.rct.center = xy
+        self.vx, self.vy = vxy
+        
+    def blit(self, scr:Screen):
+        scr.sfc.blit(self.sfc, self.rct)
+
+    def update(self, scr:Screen):
+        self.rct.move_ip(self.vx, self.vy)
+        yoko, tate = check_bound(self.rct, scr.rct)
+        self.vx *= yoko
+        self.vy *= tate
+        self.blit(scr)
 
 
 #　三瓶栄治：第13回　個人機能追加
@@ -207,6 +225,11 @@ def main():
         bkd_lst.append(bkd)
     # bkd.update(scr)
 
+    #キノコの生成 長濱
+    knk = BigMushroom("fig/bigkinoko.png", (random.choice(range(-2, 3)),
+                      random.choice(range(-2, 3))), (100,100), 0.1) 
+    life = 0
+
     #安全地帯生成アイテムの初期設定
     gd_x = random.randint(300,1500)
     gd_y = random.randint(300,700)
@@ -237,6 +260,33 @@ def main():
             if event.type == pg.QUIT:
                 return
 
+        kkt.update(scr)
+        for i in range(len(bkd_lst)):
+            bkd_lst[i].update(scr)
+            if kkt.rct.colliderect(bkd_lst[i].rct):
+                if life == 1: #ライフがある場合 長濱
+                    life -= 1
+                    bkd_lst[i].rct.centerx = -9999 #爆弾を画面外に
+                    bkd_lst[i].rct.centery = -9999
+                    kkt = Bird("fig/6.png", 2, kkt.rct.center) #元の大きさに変更
+                else:
+                    #ゲーム終了時のスコアの表示
+                    text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
+                    text_2_place = text_2.get_rect(midbottom=(800, 450))
+                    scr.sfc.blit(text_2, text_2_place)
+                    pg.display.update()
+                    time.sleep(5)
+                    return
+        #長濱
+        if kkt.rct.colliderect(knk.rct):
+            life += 1 #内部的なライフを増やす
+            knk.rct.centerx = -9999 #衝突時きのこを画面外に
+            knk.rct.centery = -9999
+            kkt = Bird("fig/6.png", 4, kkt.rct.center) #大きさを変更
+        
+        else: 
+            knk.update(scr)
+            
         gd.update(scr)
 
         if kkt.rct.colliderect(gd_item.rct): #安全地帯生成アイテム取得時
