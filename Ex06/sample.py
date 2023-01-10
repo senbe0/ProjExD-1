@@ -68,7 +68,7 @@ class Bomb:
         self.vx *= yoko
         self.vy *= tate
         self.blit(scr)
-#キノコを生成する関数
+#キノコを生成する関数 長濱
 class BigMushroom:
     def __init__(self, img_path, vxy, xy, ratio):
         self.sfc = pg.image.load(img_path)
@@ -160,7 +160,7 @@ def main():
         bkd = Bomb(color_lst[i%5], 10, (random.choice(range(-2, 3)), random.choice(range(-2, 3))), scr)
         bkd_lst.append(bkd)
     # bkd.update(scr)
-    #キノコの生成
+    #キノコの生成 長濱
     knk = BigMushroom("fig/bigkinoko.png", (random.choice(range(-2, 3)),
                       random.choice(range(-2, 3))), (100,100), 0.1) 
     life = 0
@@ -187,7 +187,7 @@ def main():
         for i in range(len(bkd_lst)):
             bkd_lst[i].update(scr)
             if kkt.rct.colliderect(bkd_lst[i].rct):
-                if life == 1: #ライフがある場合
+                if life == 1: #ライフがある場合 長濱
                     life -= 1
                     bkd_lst[i].rct.centerx = -9999 #爆弾を画面外に
                     bkd_lst[i].rct.centery = -9999
@@ -200,7 +200,7 @@ def main():
                     pg.display.update()
                     time.sleep(5)
                     return
-                    
+        #長濱
         if kkt.rct.colliderect(knk.rct):
             life += 1 #内部的なライフを増やす
             knk.rct.centerx = -9999 #衝突時きのこを画面外に
@@ -209,6 +209,7 @@ def main():
         
         else: 
             knk.update(scr)
+
         pg.display.update()
         clock.tick(1000)
     
