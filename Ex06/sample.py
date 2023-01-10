@@ -50,14 +50,15 @@ class Bird:
 
 
 class Bomb:
-    def __init__(self, color, rad, vxy, scr:Screen):
+    def __init__(self, color, rad, vxy, scr:Screen,  posx=None, posy=None):
         self.sfc = pg.Surface((2*rad, 2*rad)) # 正方形の空のSurface
         self.sfc.set_colorkey((0, 0, 0))
         pg.draw.circle(self.sfc, color, (rad, rad), rad)
         self.rct = self.sfc.get_rect()
-        self.rct.centerx = random.randint(0, scr.rct.width)
-        self.rct.centery = random.randint(0, scr.rct.height)
+        self.rct.centerx = random.randint(0, scr.rct.width) if posx is None else posx #変更点(壁に当たっているかのための判断)
+        self.rct.centery = random.randint(0, scr.rct.height) if posy is None else posy #変更点(壁に当たっているかのための判断)
         self.vx, self.vy = vxy
+        self.countwall = 0
 
     def blit(self, scr:Screen):
         scr.sfc.blit(self.sfc, self.rct)
@@ -65,8 +66,10 @@ class Bomb:
     def update(self, scr:Screen):
         self.rct.move_ip(self.vx, self.vy)
         yoko, tate = check_bound(self.rct, scr.rct)
-        self.vx *= yoko
-        self.vy *= tate
+        self.countwall = check_bound_count(self.rct, scr.rct, self.countwall)
+        #無条件で加速する爆弾(追加)
+        self.vx *= yoko * 1.0002
+        self.vy *= tate * 1.0002
         self.blit(scr)
 #キノコを生成する関数 長濱
 class BigMushroom:
@@ -117,6 +120,18 @@ class Up_kinoko(object):
     # HPを減らす
     def minusLives(self):
         self.lives -= 1
+
+    def check_bound_count(obj_rct, scr_rct, countup): #x座標とy座標で反射した時の反射回数のカウント
+        """
+        第1引数：こうかとんrectまたは爆弾rect
+        第2引数：スクリーンrect
+        範囲内：+1／範囲外：-1
+        """
+        if obj_rct.left < scr_rct.left or scr_rct.right < obj_rct.right:
+            countup += 1
+        if obj_rct.top < scr_rct.top or scr_rct.bottom < obj_rct.bottom:
+            countup += 1
+        return countup
 
 #スコアを計測する関数
 class Score:
@@ -263,6 +278,13 @@ def main():
         kkt.update(scr)
         for i in range(len(bkd_lst)):
             bkd_lst[i].update(scr)
+
+            if bkd_lst[i].countwall == 3:  #壁に爆弾が反射すると分散する
+                bkd_lst[i].countwall = 0
+                bkd = Bomb((255, 0, 0), 10, (+1, +1), scr, bkd_lst[i].rct.centerx, bkd_lst[i].rct.centery)
+                if len(bkd_lst) <= 3: #個数に制限をかける
+                    bkd_lst.append(bkd)
+
             if kkt.rct.colliderect(bkd_lst[i].rct):
                 if life == 1: #ライフがある場合 長濱
                     life -= 1
