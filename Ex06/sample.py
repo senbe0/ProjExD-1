@@ -121,17 +121,17 @@ class Up_kinoko(object):
     def minusLives(self):
         self.lives -= 1
 
-    def check_bound_count(obj_rct, scr_rct, countup): #x座標とy座標で反射した時の反射回数のカウント
-        """
-        第1引数：こうかとんrectまたは爆弾rect
-        第2引数：スクリーンrect
-        範囲内：+1／範囲外：-1
-        """
-        if obj_rct.left < scr_rct.left or scr_rct.right < obj_rct.right:
-            countup += 1
-        if obj_rct.top < scr_rct.top or scr_rct.bottom < obj_rct.bottom:
-            countup += 1
-        return countup
+def check_bound_count(obj_rct, scr_rct, countup): #x座標とy座標で反射した時の反射回数のカウント
+    """
+    第1引数：こうかとんrectまたは爆弾rect
+    第2引数：スクリーンrect
+    範囲内：+1／範囲外：-1
+    """
+    if obj_rct.left < scr_rct.left or scr_rct.right < obj_rct.right:
+        countup += 1
+    if obj_rct.top < scr_rct.top or scr_rct.bottom < obj_rct.bottom:
+        countup += 1
+    return countup
 
 #スコアを計測する関数
 class Score:
@@ -285,20 +285,8 @@ def main():
                 if len(bkd_lst) <= 3: #個数に制限をかける
                     bkd_lst.append(bkd)
 
-            if kkt.rct.colliderect(bkd_lst[i].rct):
-                if life == 1: #ライフがある場合 長濱
-                    life -= 1
-                    bkd_lst[i].rct.centerx = -9999 #爆弾を画面外に
-                    bkd_lst[i].rct.centery = -9999
-                    kkt = Bird("fig/6.png", 2, kkt.rct.center) #元の大きさに変更
-                else:
-                    #ゲーム終了時のスコアの表示
-                    text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
-                    text_2_place = text_2.get_rect(midbottom=(800, 450))
-                    scr.sfc.blit(text_2, text_2_place)
-                    pg.display.update()
-                    time.sleep(5)
-                    return
+            #if kkt.rct.colliderect(bkd_lst[i].rct):
+                
         #長濱
         if kkt.rct.colliderect(knk.rct):
             life += 1 #内部的なライフを増やす
@@ -337,7 +325,12 @@ def main():
                 bkd_lst[i].update(scr)
                 if kkt.rct.colliderect(bkd_lst[i].rct):
                 #ゲーム終了時のスコアの表示
-
+                    if life == 1: #ライフがある場合 長濱
+                        life -= 1
+                        bkd_lst[i].rct.centerx = -9999 #爆弾を画面外に
+                        bkd_lst[i].rct.centery = -9999
+                        kkt = Bird("fig/6.png", 2, kkt.rct.center) #元の大きさに変更
+                    
         #kkt.update(scr)
                     for i in range(len(bkd_lst)):
                         bkd_lst[i].update(scr)
