@@ -69,6 +69,7 @@ class Bomb:
         self.vy *= tate
         self.blit(scr)
 
+#スコアを計測する関数
 class Score:
     def __init__(self):
         self.t = 0#時間の変数
@@ -76,9 +77,9 @@ class Score:
     
     def update(self):
         self.t += 1
-        if self.t % 200 == 0:
+        if self.t % 200 == 0:#一定時間ごとにスコアを１追加する
             self.sco += 1
-            if self.t >= 5000:
+            if self.t >= 5000:#時間が長くなるにつれ、スコアの上がり幅が上がる
                 if self.t % 100 == 0:
                     self.sco += 2
         return self.sco
@@ -149,6 +150,7 @@ def main():
     while True:        
         scr.blit()
 
+        #ゲーム中のスコアの表示
         ans = score.update()
         text = font1.render(f"{ans}", True, (255,0,0))
         scr.sfc.blit(text, (100, 100))
@@ -164,6 +166,7 @@ def main():
         for i in range(len(bkd_lst)):
             bkd_lst[i].update(scr)
             if kkt.rct.colliderect(bkd_lst[i].rct):
+                #ゲーム終了時のスコアの表示
                 text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
                 text_2_place = text_2.get_rect(midbottom=(800, 450))
                 scr.sfc.blit(text_2, text_2_place)
