@@ -70,7 +70,7 @@ class Bomb:
         self.blit(scr)
 
 
-#　第13回　個人機能追加
+#　三瓶栄治：第13回　個人機能追加
 class Up_kinoko(object):
     def __init__(self, lives, scr:Screen):
         self.text_font = pg.font.Font("font/Pixeltype.ttf", 50)
@@ -162,7 +162,7 @@ def main():
     # 練習１
     scr = Screen("逃げろ！こうかとん", (1600,900), "fig/pg_bg.jpg")
 
-    #　「追加」キノコインスタンス生成
+    #　三瓶栄治：「追加」キノコインスタンス生成
     upkinoko = Up_kinoko(200, scr)
 
     # 練習３
@@ -184,7 +184,7 @@ def main():
     while True:        
         scr.blit()
 
-        # 「追加」　キノコと残機の表示
+        # 三瓶栄治：「追加」　キノコと残機の表示
         upkinoko.blit_zanki(scr)
         upkinoko.blit_kinoko(scr)
 
@@ -203,10 +203,11 @@ def main():
             bkd_lst[i].update(scr)
             if kkt.rct.colliderect(bkd_lst[i].rct):
 
-                #　「追加」HPを減らす
+                #　三瓶栄治：「追加」HPを減らす
                 upkinoko.minusLives()
 
                 #ゲーム終了時のスコアの表示
+                #　三瓶栄治：HP判定
                 if upkinoko.lives <= 0:                    
                     text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
                     text_2_place = text_2.get_rect(midbottom=(800, 450))
@@ -215,7 +216,7 @@ def main():
                     time.sleep(5)
                     return
 
-        #　HPを回復
+        #　三瓶栄治：HPを回復
         if kkt.rct.colliderect(upkinoko.kinoko_rct):
             upkinoko.plusLives()
             upkinoko.hide_kinoko(scr)
