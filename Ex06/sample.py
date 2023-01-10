@@ -142,6 +142,36 @@ def load_sound(file):
     return None
 
 
+#安全地帯関連作成者：C0A21015 市古周馬
+class Guard_item: #安全地帯生成アイテム
+    def __init__(self,image,ratio,xy):
+        self.sfc = pg.image.load(image)
+        self.sfc = pg.transform.rotozoom(self.sfc, 0, ratio)
+        self.rct = self.sfc.get_rect()
+        self.rct.center = xy
+
+    def blit(self, scr:Screen):
+        scr.sfc.blit(self.sfc, self.rct)
+        
+    def update(self, scr:Screen):
+        self.blit(scr)   
+
+
+class Guard: #安全地帯の生成
+    def __init__(self, color, rad, x, y, scr:Screen):
+        self.sfc = pg.Surface((2*rad, 2*rad)) # 正方形の空のSurface
+        self.sfc.set_colorkey((0, 0, 0))
+        pg.draw.circle(self.sfc, color, (rad, rad), rad)
+        self.rct = self.sfc.get_rect()
+        self.rct.centerx = x
+        self.rct.centery = y
+
+    def blit(self, scr:Screen):
+        scr.sfc.blit(self.sfc, self.rct)
+
+    def update(self, scr:Screen):
+        self.blit(scr)
+
 def main():
     if pg.get_sdl_version()[0] == 2:
         pg.mixer.pre_init(44100, 32, 2, 1024)
@@ -177,6 +207,16 @@ def main():
         bkd_lst.append(bkd)
     # bkd.update(scr)
 
+    #安全地帯生成アイテムの初期設定
+    gd_x = random.randint(300,1500)
+    gd_y = random.randint(300,700)
+    gd_item = Guard_item("fig/7.png",0.5,(gd_x, gd_y))
+    gd_item.update(scr)
+
+    #安全地帯の初期設定
+    gd_rad = 100
+    gd = Guard("pink", gd_rad, -100, -100, scr) 
+
     font1 = pg.font.SysFont(None, 50)
     score = Score()
 
@@ -193,33 +233,70 @@ def main():
         text = font1.render(f"{ans}", True, (255,0,0))
         scr.sfc.blit(text, (100, 100))
 
-
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
 
-        kkt.update(scr)
-        for i in range(len(bkd_lst)):
-            bkd_lst[i].update(scr)
-            if kkt.rct.colliderect(bkd_lst[i].rct):
+        gd.update(scr)
 
-                #　三瓶栄治：「追加」HPを減らす
-                upkinoko.minusLives()
+        if kkt.rct.colliderect(gd_item.rct): #安全地帯生成アイテム取得時
+            gd_rad = 100 #半径を100に再設定
+            gd = Guard("pink", gd_rad, gd_x, gd_y, scr) #アイテムの場所に安置を生成
+            old_gd_x = gd_x #現在の安全地帯の座標を格納
+            old_gd_y = gd_y
+            gd_x = random.randint(300,1500) #安全地帯生成アイテムの座標更新
+            gd_y = random.randint(300,700)
+            gd_item = Guard_item("fig/7.png",0.5,(gd_x,gd_y))
+            gd_item.update(scr)
+            gd.update(scr)       
 
+        if kkt.rct.colliderect(gd.rct): #安全地帯にいる場合
+            for i in range(len(bkd_lst)):
+                if gd.rct.colliderect(bkd_lst[i].rct): #安全地帯に爆弾が触れた際
+                    gd_rad -= 0.15 #安全地帯の大きさが減少
+                    gd = Guard("red", gd_rad, old_gd_x, old_gd_y, scr)
+                    gd.update(scr)
+                bkd_lst[i].update(scr)    
+        else:
+            for i in range(len(bkd_lst)):
+                if gd.rct.colliderect(bkd_lst[i].rct): #安全地帯に爆弾が触れた際
+                    gd =  Guard("pink", 100, -100, -100, scr) #画面から安全地帯が消失
+                    gd.update(scr)
+                bkd_lst[i].update(scr)
+                if kkt.rct.colliderect(bkd_lst[i].rct):
                 #ゲーム終了時のスコアの表示
-                #　三瓶栄治：HP判定
-                if upkinoko.lives <= 0:                    
-                    text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
-                    text_2_place = text_2.get_rect(midbottom=(800, 450))
-                    scr.sfc.blit(text_2, text_2_place)
-                    pg.display.update()
-                    time.sleep(5)
-                    return
+
+        #kkt.update(scr)
+                    for i in range(len(bkd_lst)):
+                        bkd_lst[i].update(scr)
+                        if kkt.rct.colliderect(bkd_lst[i].rct):
+
+                            #　三瓶栄治：「追加」HPを減らす
+                            upkinoko.minusLives()
+
+                            #ゲーム終了時のスコアの表示
+                            #　三瓶栄治：HP判定
+                            if upkinoko.lives <= 0:                    
+
+                                text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
+                                text_2_place = text_2.get_rect(midbottom=(800, 450))
+                                scr.sfc.blit(text_2, text_2_place)
+                                pg.display.update()
+                                time.sleep(5)
+                                return
+
+        if gd_rad <=65:  #安全地帯の半径が65以下になったら
+            gd =  Guard("pink", 100, -100, -100, scr) #画面から安全地帯の消失
+            gd.update(scr) 
+
+        gd_item.update(scr) 
+        kkt.update(scr)              
 
         #　三瓶栄治：HPを回復
         if kkt.rct.colliderect(upkinoko.kinoko_rct):
             upkinoko.plusLives()
             upkinoko.hide_kinoko(scr)
+
 
         pg.display.update()
         clock.tick(1000)
