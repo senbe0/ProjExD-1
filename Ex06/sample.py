@@ -69,6 +69,37 @@ class Bomb:
         self.vy *= tate
         self.blit(scr)
 
+
+#　三瓶栄治：第13回　個人機能追加
+class Up_kinoko(object):
+    def __init__(self, lives, scr:Screen):
+        self.text_font = pg.font.Font("font/Pixeltype.ttf", 50)
+        self.lives = lives
+        self.kinoko_sfc = pg.image.load("fig/1up.png").convert_alpha()
+        self.kinoko_rct = self.kinoko_sfc.get_rect(midbottom=(500, 600))
+
+    #　キノコを表示
+    def blit_kinoko(self, scr:Screen):
+        scr.sfc.blit(self.kinoko_sfc, self.kinoko_rct)
+
+    #　残機表示する
+    def blit_zanki(self, scr:Screen):
+        self.text_sfc = self.text_font.render(f"HP =  {self.lives}   !!", False, "Red")
+        scr.sfc.blit(self.text_sfc, (1000, 100))
+
+    #　キノコを削除
+    def hide_kinoko(self, scr:Screen):
+        self.kinoko_rct = self.kinoko_sfc.get_rect(midbottom=(-10, -10))
+        scr.sfc.blit(self.kinoko_sfc, self.kinoko_rct)
+
+    # HPを回復する
+    def plusLives(self):
+        self.lives += 100    
+
+    # HPを減らす
+    def minusLives(self):
+        self.lives -= 1
+
 #スコアを計測する関数
 class Score:
     def __init__(self):
@@ -131,6 +162,9 @@ def main():
     # 練習１
     scr = Screen("逃げろ！こうかとん", (1600,900), "fig/pg_bg.jpg")
 
+    #　三瓶栄治：「追加」キノコインスタンス生成
+    upkinoko = Up_kinoko(200, scr)
+
     # 練習３
     kkt = Bird("fig/6.png", 2.0, (900,400))
     kkt.update(scr)
@@ -150,12 +184,14 @@ def main():
     while True:        
         scr.blit()
 
+        # 三瓶栄治：「追加」　キノコと残機の表示
+        upkinoko.blit_zanki(scr)
+        upkinoko.blit_kinoko(scr)
+
         #ゲーム中のスコアの表示
         ans = score.update()
         text = font1.render(f"{ans}", True, (255,0,0))
         scr.sfc.blit(text, (100, 100))
-
-
 
 
         for event in pg.event.get():
@@ -166,13 +202,24 @@ def main():
         for i in range(len(bkd_lst)):
             bkd_lst[i].update(scr)
             if kkt.rct.colliderect(bkd_lst[i].rct):
+
+                #　三瓶栄治：「追加」HPを減らす
+                upkinoko.minusLives()
+
                 #ゲーム終了時のスコアの表示
-                text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
-                text_2_place = text_2.get_rect(midbottom=(800, 450))
-                scr.sfc.blit(text_2, text_2_place)
-                pg.display.update()
-                time.sleep(5)
-                return
+                #　三瓶栄治：HP判定
+                if upkinoko.lives <= 0:                    
+                    text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
+                    text_2_place = text_2.get_rect(midbottom=(800, 450))
+                    scr.sfc.blit(text_2, text_2_place)
+                    pg.display.update()
+                    time.sleep(5)
+                    return
+
+        #　三瓶栄治：HPを回復
+        if kkt.rct.colliderect(upkinoko.kinoko_rct):
+            upkinoko.plusLives()
+            upkinoko.hide_kinoko(scr)
 
         pg.display.update()
         clock.tick(1000)
