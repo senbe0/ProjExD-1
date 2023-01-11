@@ -1,7 +1,6 @@
 import pygame as pg
 import os
 import random
-import sys
 import time
 
 
@@ -10,14 +9,14 @@ main_dir = os.path.split(os.path.abspath(__file__))[0]
 
 class Screen:
     def __init__(self, title, wh, img_path):
-        pg.display.set_caption(title) 
+        pg.display.set_caption(title)
         self.sfc = pg.display.set_mode(wh)
         self.rct = self.sfc.get_rect()
         self.bgi_sfc = pg.image.load(img_path)
-        self.bgi_rct = self.bgi_sfc.get_rect() 
+        self.bgi_rct = self.bgi_sfc.get_rect()
 
     def blit(self):
-        self.sfc.blit(self.bgi_sfc, self.bgi_rct) 
+        self.sfc.blit(self.bgi_sfc, self.bgi_rct)
 
 
 class Bird:
@@ -42,17 +41,17 @@ class Bird:
         for key, delta in Bird.key_delta.items():
             if key_dct[key]:
                 self.rct.centerx += delta[0]
-                self.rct.centery += delta[1]  
+                self.rct.centery += delta[1]
             if check_bound(self.rct, scr.rct) != (+1, +1):
                 self.rct.centerx -= delta[0]
                 self.rct.centery -= delta[1]
-        self.blit(scr)                    
+        self.blit(scr)
 
 
 class Bomb:
     def __init__(self, color, rad, vxy, scr:Screen,  posx=None, posy=None):
         # 正方形の空のSurface
-        self.sfc = pg.Surface((2*rad, 2*rad)) 
+        self.sfc = pg.Surface((2*rad, 2*rad))
         self.sfc.set_colorkey((0, 0, 0))
         pg.draw.circle(self.sfc, color, (rad, rad), rad)
         self.rct = self.sfc.get_rect()
@@ -83,7 +82,7 @@ class BigMushroom:
         self.rct = self.sfc.get_rect()
         self.rct.center = xy
         self.vx, self.vy = vxy
-        
+
     def blit(self, scr:Screen):
         scr.sfc.blit(self.sfc, self.rct)
 
@@ -119,7 +118,7 @@ class Up_kinoko(object):
 
     # HPを回復する
     def plusLives(self):
-        self.lives += 100    
+        self.lives += 100
 
     # HPが減少する
     def minusLives(self):
@@ -133,7 +132,7 @@ class Score:
         self.t = 0
         # スコアの変数
         self.sco = 0
-    
+
     def update(self):
         self.t += 1
         # 一定時間ごとにスコアを１追加する
@@ -148,7 +147,7 @@ class Score:
 
 # 安全地帯関連作成者：C0A21015 市古周馬
 # 安全地帯生成アイテム
-class Guard_item: 
+class Guard_item:
     def __init__(self,image,ratio,xy):
         self.sfc = pg.image.load(image)
         self.sfc = pg.transform.rotozoom(self.sfc, 0, ratio)
@@ -157,16 +156,16 @@ class Guard_item:
 
     def blit(self, scr:Screen):
         scr.sfc.blit(self.sfc, self.rct)
-        
+
     def update(self, scr:Screen):
-        self.blit(scr)   
+        self.blit(scr)
 
 
 # 安全地帯の生成
-class Guard: 
+class Guard:
     def __init__(self, color, rad, x, y, scr:Screen):
         # 正方形の空のSurface
-        self.sfc = pg.Surface((2*rad, 2*rad)) 
+        self.sfc = pg.Surface((2*rad, 2*rad))
         self.sfc.set_colorkey((0, 0, 0))
         pg.draw.circle(self.sfc, color, (rad, rad), rad)
         self.rct = self.sfc.get_rect()
@@ -181,7 +180,7 @@ class Guard:
 
 
 # x座標とy座標で反射した時の反射回数のカウント
-def check_bound_count(obj_rct, scr_rct, countup: int) -> int: 
+def check_bound_count(obj_rct, scr_rct, countup: int) -> int:
     if obj_rct.left < scr_rct.left or scr_rct.right < obj_rct.right:
         countup += 1
     if obj_rct.top < scr_rct.top or scr_rct.bottom < obj_rct.bottom:
@@ -214,17 +213,14 @@ def load_sound(file):
     return None
 
 def main():
+    pg.init()
+
     if pg.get_sdl_version()[0] == 2:
         pg.mixer.pre_init(44100, 32, 2, 1024)
-
-    pg.init()
 
     if pg.mixer and not pg.mixer.get_init():
         print("Warning, no sound")
         pg.mixer = None
-
-    boom_sound = load_sound("boom.wav")
-    shoot_sound = load_sound("car_door.wav")
 
     if pg.mixer:
         music = os.path.join(main_dir, "data", "house_lo.wav")
@@ -250,11 +246,9 @@ def main():
         bkd = Bomb(color_lst[i%5], 10, (random.choice(range(-2, 3)), random.choice(range(-2, 3))), scr)
         bkd_lst.append(bkd)
 
-    # bkd.update(scr)
-
     # キノコの生成 長濱
     knk = BigMushroom("fig/bigkinoko.png", (random.choice(range(-2, 3)),
-                      random.choice(range(-2, 3))), (100,100), 0.1) 
+                      random.choice(range(-2, 3))), (100,100), 0.1)
     life = 0
 
     # 安全地帯生成アイテムの初期設定
@@ -265,13 +259,13 @@ def main():
 
     # 安全地帯の初期設定
     gd_rad = 100
-    gd = Guard("pink", gd_rad, -100, -100, scr) 
+    gd = Guard("pink", gd_rad, -100, -100, scr)
 
     font1 = pg.font.SysFont(None, 50)
     score = Score()
 
     # 練習２
-    while True:        
+    while True:
         scr.blit()
 
         # 三瓶栄治(C0A21163)：「追加」　キノコと残機の表示
@@ -299,8 +293,6 @@ def main():
                 if len(bkd_lst) <= 3:
                     bkd_lst.append(bkd)
 
-            #if kkt.rct.colliderect(bkd_lst[i].rct):
-                
         # 長濱
         if kkt.rct.colliderect(knk.rct):
             # 内部的なライフを増やす
@@ -310,9 +302,9 @@ def main():
             knk.rct.centery = -9999
             # 大きさを変更
             kkt = Bird("fig/6.png", 4, kkt.rct.center)
-        else: 
+        else:
             knk.update(scr)
-            
+
         gd.update(scr)
 
         # 安全地帯生成アイテム取得時
@@ -325,41 +317,39 @@ def main():
             old_gd_x = gd_x
             old_gd_y = gd_y
             # 安全地帯生成アイテムの座標更新
-            gd_x = random.randint(300,1500) 
+            gd_x = random.randint(300,1500)
             gd_y = random.randint(300,700)
             gd_item = Guard_item("fig/7.png",0.5,(gd_x,gd_y))
             gd_item.update(scr)
-            gd.update(scr)       
+            gd.update(scr)
 
         # 安全地帯にいる場合
-        if kkt.rct.colliderect(gd.rct): 
+        if kkt.rct.colliderect(gd.rct):
             for i in range(len(bkd_lst)):
                 # 安全地帯に爆弾が触れた際
-                if gd.rct.colliderect(bkd_lst[i].rct): 
+                if gd.rct.colliderect(bkd_lst[i].rct):
                     # 安全地帯の大きさが減少
                     gd_rad -= 0.15
                     gd = Guard("red", gd_rad, old_gd_x, old_gd_y, scr)
                     gd.update(scr)
-                bkd_lst[i].update(scr)    
+                bkd_lst[i].update(scr)
         else:
             for i in range(len(bkd_lst)):
                 # 安全地帯に爆弾が触れた際
-                if gd.rct.colliderect(bkd_lst[i].rct): 
+                if gd.rct.colliderect(bkd_lst[i].rct):
                     # 画面から安全地帯が消失
-                    gd =  Guard("pink", 100, -100, -100, scr) 
+                    gd =  Guard("pink", 100, -100, -100, scr)
                     gd.update(scr)
                 bkd_lst[i].update(scr)
                 if kkt.rct.colliderect(bkd_lst[i].rct):
                     # ライフがある場合 長濱
-                    if life == 1: 
+                    if life == 1:
                         life -= 1
                         # 爆弾を画面外に
-                        bkd_lst[i].rct.centerx = -9999 
+                        bkd_lst[i].rct.centerx = -9999
                         bkd_lst[i].rct.centery = -9999
                         # 元の大きさに変更
-                        kkt = Bird("fig/6.png", 2, kkt.rct.center) 
-
-        #kkt.update(scr)
+                        kkt = Bird("fig/6.png", 2, kkt.rct.center)
 
                     for i in range(len(bkd_lst)):
                         bkd_lst[i].update(scr)
@@ -368,7 +358,7 @@ def main():
                             upkinoko.minusLives()
                             # ゲーム終了時のスコアの表示
                             # 三瓶栄治(C0A21163)：HP判定
-                            if upkinoko.lives <= 0:                    
+                            if upkinoko.lives <= 0:
                                 text_2 = font1.render(f"your score is {ans}", True, (255,0,0))
                                 text_2_place = text_2.get_rect(midbottom=(800, 450))
                                 scr.sfc.blit(text_2, text_2_place)
@@ -377,13 +367,13 @@ def main():
                                 return
 
         # 安全地帯の半径が65以下になったら
-        if gd_rad <=65:  
+        if gd_rad <=65:
             # 画面から安全地帯の消失
-            gd =  Guard("pink", 100, -100, -100, scr) 
-            gd.update(scr) 
+            gd =  Guard("pink", 100, -100, -100, scr)
+            gd.update(scr)
 
-        gd_item.update(scr) 
-        kkt.update(scr)              
+        gd_item.update(scr)
+        kkt.update(scr)
 
         # 三瓶栄治(C0A21163)：HPを回復
         if kkt.rct.colliderect(upkinoko.kinoko_rct):
@@ -392,9 +382,10 @@ def main():
 
         pg.display.update()
         clock.tick(1000)
-    
+
 
 if __name__ == "__main__":
+    import sys
     pg.init()
     main()
     pg.quit()
